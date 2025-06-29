@@ -354,13 +354,11 @@
         let selectedDate = '';
         let selectedTime = '';
         let totalDuration = 0;
-
-        // Inicializar data mínima como hoje
+        
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('bookingDate').min = today;
         document.getElementById('bookingDate').value = today;
 
-        // Event listeners para serviços
         document.querySelectorAll('.service-item').forEach(item => {
             item.addEventListener('click', function() {
                 const service = this.dataset.service;
@@ -369,11 +367,10 @@
                 const name = this.querySelector('.service-name').textContent;
 
                 if (this.classList.contains('selected')) {
-                    // Remover serviço
                     this.classList.remove('selected');
                     selectedServices = selectedServices.filter(s => s.service !== service);
                 } else {
-                    // Adicionar serviço
+                 
                     this.classList.add('selected');
                     selectedServices.push({
                         service: service,
@@ -388,7 +385,6 @@
             });
         });
 
-        // Event listener para data
         document.getElementById('bookingDate').addEventListener('change', function() {
             selectedDate = this.value;
             generateTimeSlots();
@@ -405,21 +401,18 @@
             const dateObj = new Date(selectedDate + 'T00:00:00');
             const dayOfWeek = dateObj.getDay();
 
-            // Verificar se é domingo (0)
+            (0)
             if (dayOfWeek === 0) {
                 timeSlotsContainer.innerHTML = '<p style="text-align: center; opacity: 0.7;">Fechado aos domingos</p>';
                 return;
             }
 
-            // Calcular duração total dos serviços selecionados
             totalDuration = selectedServices.reduce((total, service) => total + service.duration, 0);
 
-            // Gerar horários de 9h às 19h
             for (let hour = 9; hour < 19; hour++) {
                 for (let minute = 0; minute < 60; minute += 30) {
                     const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-                    
-                    // Verificar se há tempo suficiente para o serviço antes do fechamento (19h)
+                
                     const serviceEndTime = new Date(`2000-01-01T${timeString}`);
                     serviceEndTime.setMinutes(serviceEndTime.getMinutes() + totalDuration);
                     const closingTime = new Date('2000-01-01T19:00');
@@ -486,20 +479,16 @@
             bookBtn.disabled = !isValid;
         }
 
-        // Event listeners para campos obrigatórios
         document.getElementById('clientName').addEventListener('input', updateBookButton);
         document.getElementById('clientPhone').addEventListener('input', updateBookButton);
 
-        // Event listener para confirmar agendamento
         document.getElementById('bookBtn').addEventListener('click', function() {
             const clientName = document.getElementById('clientName').value.trim();
             const clientPhone = document.getElementById('clientPhone').value.trim();
-            
-            // Preparar dados do agendamento
+          
             const totalPrice = selectedServices.reduce((total, service) => total + service.price, 0);
             const servicesList = selectedServices.map(s => s.name).join(', ');
-            
-            // Formatar data para exibição
+       
             const dateObj = new Date(selectedDate + 'T00:00:00');
             const formattedDate = dateObj.toLocaleDateString('pt-BR', {
                 weekday: 'long',
@@ -508,7 +497,6 @@
                 day: 'numeric'
             });
 
-            // Criar mensagem para WhatsApp
             const message = `🪒 *NOVO AGENDAMENTO - *MEN´S BARNERSHOP*
 
 👤 *Cliente:* ${clientName}
@@ -525,19 +513,14 @@ ${selectedServices.map(s => `• ${s.name} - R$ ${s.price}`).join('\n')}
 ---
 *Agendamento feito pelo site*`;
 
-            // NÚMERO DO WHATSAPP DA BARBEARIA
             const whatsappNumber = '5583987463596'; // Formato: 55 + DDD + número (sem espaços)
-            
-            // Enviar para WhatsApp
+          
             const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-            
-            // Abrir WhatsApp em nova aba
+
             window.open(whatsappURL, '_blank');
 
-            // Mostrar mensagem de sucesso
             document.getElementById('successMessage').style.display = 'block';
-            
-            // Opcional: Salvar no localStorage para histórico
+           
             const appointment = {
                 id: Date.now(),
                 cliente: clientName,
@@ -548,19 +531,16 @@ ${selectedServices.map(s => `• ${s.name} - R$ ${s.price}`).join('\n')}
                 valor_total: totalPrice,
                 timestamp: new Date().toISOString()
             };
-            
-            // Salvar agendamento (você pode conectar isso a um banco de dados)
+     
             let appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
             appointments.push(appointment);
             localStorage.setItem('appointments', JSON.stringify(appointments));
-            
-            // Reset do formulário após alguns segundos
+       
             setTimeout(() => {
                 location.reload();
             }, 4000);
         });
 
-        // Inicializar com a data de hoje
         selectedDate = today;
         generateTimeSlots();
     </script>
