@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barbearia Premium - Agendamento Online</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            border-radius: 15px;
+            color: #000;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.8;
+        }
+
+        .booking-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .services-section, .booking-section {
+            background: rgba(255,255,255,0.1);
+            padding: 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #ffd700;
+            text-align: center;
+        }
+
+        .service-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .service-item:hover {
+            background: rgba(212, 175, 55, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .service-item.selected {
+            border-color: #ffd700;
+            background: rgba(212, 175, 55, 0.3);
+        }
+
+        .service-name {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .service-price {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            font-size: 16px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #ffd700;
+            background: rgba(255,255,255,0.15);
+        }
+
+        input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .time-slot {
+            padding: 10px;
+            text-align: center;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .time-slot:hover {
+            background: rgba(212, 175, 55, 0.2);
+        }
+
+        .time-slot.selected {
+            border-color: #ffd700;
+            background: rgba(212, 175, 55, 0.3);
+        }
+
+        .time-slot.unavailable {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .book-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .book-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4);
+        }
+
+        .book-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .summary {
+            background: rgba(0,255,0,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 1px solid rgba(0,255,0,0.3);
+        }
+
+        .total {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #ffd700;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .booking-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .time-slots {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+
+        .success-message {
+            background: rgba(0,255,0,0.2);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+            border: 2px solid rgba(0,255,0,0.5);
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🪒 Barbearia Premium</h1>
+            <p class="subtitle">Agendamento Online - Segunda a Sábado, 9h às 19h</p>
+        </header>
+
+        <div class="success-message" id="successMessage">
+            <h3>✅ Agendamento Enviado!</h3>
+            <p>Sua solicitação foi enviada via WhatsApp. Aguarde nossa confirmação!</p>
+            <p><small>O WhatsApp será aberto automaticamente com sua mensagem pronta.</small></p>
+        </div>
+
+        <div class="booking-container">
+            <div class="services-section">
+                <h2 class="section-title">🎯 Nossos Serviços</h2>
+                
+                <div class="service-item" data-service="corte" data-price="45" data-duration="45">
+                    <div>
+                        <div class="service-name">✂️ Corte de Cabelo</div>
+                        <div style="font-size: 0.9em; opacity: 0.8;">45 minutos</div>
+                    </div>
+                    <div class="service-price">R$ 45</div>
+                </div>
+
+                <div class="service-item" data-service="barba" data-price="35" data-duration="35">
+                    <div>
+                        <div class="service-name">🧔 Barba</div>
+                        <div style="font-size: 0.9em; opacity: 0.8;">35 minutos</div>
+                    </div>
+                    <div class="service-price">R$ 35</div>
+                </div>
+
+                <div class="service-item" data-service="combo" data-price="75" data-duration="75">
+                    <div>
+                        <div class="service-name">💫 Combo Corte + Barba</div>
+                        <div style="font-size: 0.9em; opacity: 0.8;">75 minutos</div>
+                    </div>
+                    <div class="service-price">R$ 75</div>
+                </div>
+
+                <div class="service-item" data-service="selagem" data-price="75" data-duration="60">
+                    <div>
+                        <div class="service-name">🔥 Selagem</div>
+                        <div style="font-size: 0.9em; opacity: 0.8;">60 minutos</div>
+                    </div>
+                    <div class="service-price">R$ 75</div>
+                </div>
+
+                <div class="service-item" data-service="pigmentacao" data-price="30" data-duration="30">
+                    <div>
+                        <div class="service-name">🎨 Pigmentação de Barba</div>
+                        <div style="font-size: 0.9em; opacity: 0.8;">30 minutos</div>
+                    </div>
+                    <div class="service-price">R$ 30</div>
+                </div>
+
+                <div class="service-item" data-service="hidratacao" data-price="40" data-duration="40">
+                    <div>
+                        <div class="service-name">💧 Hidratação</div>
+                        <div style="font-size: 0.9em; opacity: 0.8;">40 minutos</div>
+                    </div>
+                    <div class="service-price">R$ 40</div>
+                </div>
+
+                <div class="service-item" data-service="botox" data-price="50" data-duration="50">
+                    <div>
+                        <div class="service-name">💎 Botox</div>
+                        <div style="font-size: 0.9em; opacity: 0.8;">50 minutos</div>
+                    </div>
+                    <div class="service-price">R$ 50</div>
+                </div>
+
+                <div class="service-item" data-service="acabamento" data-price="15" data-duration="15">
+                    <div>
+                        <div class="service-name">✨ Acabamento</div>
+                        <div style="font-size: 0.9em; opacity: 0.8;">15 minutos</div>
+                    </div>
+                    <div class="service-price">R$ 15</div>
+                </div>
+            </div>
+
+            <div class="booking-section">
+                <h2 class="section-title">📅 Fazer Agendamento</h2>
+                
+                <div class="form-group">
+                    <label for="clientName">👤 Seu Nome:</label>
+                    <input type="text" id="clientName" placeholder="Digite seu nome completo">
+                </div>
+
+                <div class="form-group">
+                    <label for="clientPhone">📱 WhatsApp:</label>
+                    <input type="tel" id="clientPhone" placeholder="(00) 00000-0000">
+                </div>
+
+                <div class="form-group">
+                    <label for="bookingDate">📅 Data:</label>
+                    <input type="date" id="bookingDate">
+                </div>
+
+                <div class="form-group">
+                    <label>⏰ Horários Disponíveis:</label>
+                    <div class="time-slots" id="timeSlots"></div>
+                </div>
+
+                <div class="summary" id="bookingSummary" style="display: none;">
+                    <h4>📋 Resumo do Agendamento:</h4>
+                    <div id="summaryDetails"></div>
+                    <div class="total" id="totalPrice"></div>
+                </div>
+
+                <button class="book-btn" id="bookBtn" disabled>
+                    📱 Enviar Agendamento via WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedServices = [];
+        let selectedDate = '';
+        let selectedTime = '';
+        let totalDuration = 0;
+
+        // Inicializar data mínima como hoje
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('bookingDate').min = today;
+        document.getElementById('bookingDate').value = today;
+
+        // Event listeners para serviços
+        document.querySelectorAll('.service-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const service = this.dataset.service;
+                const price = parseInt(this.dataset.price);
+                const duration = parseInt(this.dataset.duration);
+                const name = this.querySelector('.service-name').textContent;
+
+                if (this.classList.contains('selected')) {
+                    // Remover serviço
+                    this.classList.remove('selected');
+                    selectedServices = selectedServices.filter(s => s.service !== service);
+                } else {
+                    // Adicionar serviço
+                    this.classList.add('selected');
+                    selectedServices.push({
+                        service: service,
+                        name: name,
+                        price: price,
+                        duration: duration
+                    });
+                }
+
+                updateSummary();
+                generateTimeSlots();
+            });
+        });
+
+        // Event listener para data
+        document.getElementById('bookingDate').addEventListener('change', function() {
+            selectedDate = this.value;
+            generateTimeSlots();
+        });
+
+        function generateTimeSlots() {
+            const timeSlotsContainer = document.getElementById('timeSlots');
+            timeSlotsContainer.innerHTML = '';
+
+            if (!selectedDate || selectedServices.length === 0) {
+                return;
+            }
+
+            const dateObj = new Date(selectedDate + 'T00:00:00');
+            const dayOfWeek = dateObj.getDay();
+
+            // Verificar se é domingo (0)
+            if (dayOfWeek === 0) {
+                timeSlotsContainer.innerHTML = '<p style="text-align: center; opacity: 0.7;">Fechado aos domingos</p>';
+                return;
+            }
+
+            // Calcular duração total dos serviços selecionados
+            totalDuration = selectedServices.reduce((total, service) => total + service.duration, 0);
+
+            // Gerar horários de 9h às 19h
+            for (let hour = 9; hour < 19; hour++) {
+                for (let minute = 0; minute < 60; minute += 30) {
+                    const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                    
+                    // Verificar se há tempo suficiente para o serviço antes do fechamento (19h)
+                    const serviceEndTime = new Date(`2000-01-01T${timeString}`);
+                    serviceEndTime.setMinutes(serviceEndTime.getMinutes() + totalDuration);
+                    const closingTime = new Date('2000-01-01T19:00');
+
+                    const timeSlot = document.createElement('div');
+                    timeSlot.className = 'time-slot';
+                    timeSlot.textContent = timeString;
+
+                    if (serviceEndTime <= closingTime) {
+                        timeSlot.addEventListener('click', function() {
+                            document.querySelectorAll('.time-slot').forEach(slot => slot.classList.remove('selected'));
+                            this.classList.add('selected');
+                            selectedTime = timeString;
+                            updateBookButton();
+                        });
+                    } else {
+                        timeSlot.classList.add('unavailable');
+                        timeSlot.title = 'Horário insuficiente para os serviços selecionados';
+                    }
+
+                    timeSlotsContainer.appendChild(timeSlot);
+                }
+            }
+        }
+
+        function updateSummary() {
+            const summaryContainer = document.getElementById('bookingSummary');
+            const summaryDetails = document.getElementById('summaryDetails');
+            const totalPriceElement = document.getElementById('totalPrice');
+
+            if (selectedServices.length === 0) {
+                summaryContainer.style.display = 'none';
+                return;
+            }
+
+            summaryContainer.style.display = 'block';
+
+            let summaryHTML = '<ul>';
+            let totalPrice = 0;
+
+            selectedServices.forEach(service => {
+                summaryHTML += `<li>${service.name} - R$ ${service.price} (${service.duration}min)</li>`;
+                totalPrice += service.price;
+            });
+
+            summaryHTML += '</ul>';
+            summaryDetails.innerHTML = summaryHTML;
+            totalPriceElement.textContent = `Total: R$ ${totalPrice}`;
+
+            updateBookButton();
+        }
+
+        function updateBookButton() {
+            const bookBtn = document.getElementById('bookBtn');
+            const clientName = document.getElementById('clientName').value.trim();
+            const clientPhone = document.getElementById('clientPhone').value.trim();
+
+            const isValid = selectedServices.length > 0 && 
+                           selectedDate && 
+                           selectedTime && 
+                           clientName && 
+                           clientPhone;
+
+            bookBtn.disabled = !isValid;
+        }
+
+        // Event listeners para campos obrigatórios
+        document.getElementById('clientName').addEventListener('input', updateBookButton);
+        document.getElementById('clientPhone').addEventListener('input', updateBookButton);
+
+        // Event listener para confirmar agendamento
+        document.getElementById('bookBtn').addEventListener('click', function() {
+            const clientName = document.getElementById('clientName').value.trim();
+            const clientPhone = document.getElementById('clientPhone').value.trim();
+            
+            // Preparar dados do agendamento
+            const totalPrice = selectedServices.reduce((total, service) => total + service.price, 0);
+            const servicesList = selectedServices.map(s => s.name).join(', ');
+            
+            // Formatar data para exibição
+            const dateObj = new Date(selectedDate + 'T00:00:00');
+            const formattedDate = dateObj.toLocaleDateString('pt-BR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // Criar mensagem para WhatsApp
+            const message = `🪒 *NOVO AGENDAMENTO - BARBEARIA PREMIUM*
+
+👤 *Cliente:* ${clientName}
+📱 *Telefone:* ${clientPhone}
+📅 *Data:* ${formattedDate}
+⏰ *Horário:* ${selectedTime}
+⏱️ *Duração:* ${totalDuration} minutos
+
+🎯 *Serviços:*
+${selectedServices.map(s => `• ${s.name} - R$ ${s.price}`).join('\n')}
+
+💰 *TOTAL: R$ ${totalPrice}*
+
+---
+*Agendamento feito pelo site*`;
+
+            // NÚMERO DO WHATSAPP DA BARBEARIA
+            const whatsappNumber = '5583987463596'; // Formato: 55 + DDD + número (sem espaços)
+            
+            // Enviar para WhatsApp
+            const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+            
+            // Abrir WhatsApp em nova aba
+            window.open(whatsappURL, '_blank');
+
+            // Mostrar mensagem de sucesso
+            document.getElementById('successMessage').style.display = 'block';
+            
+            // Opcional: Salvar no localStorage para histórico
+            const appointment = {
+                id: Date.now(),
+                cliente: clientName,
+                telefone: clientPhone,
+                data: selectedDate,
+                horario: selectedTime,
+                servicos: selectedServices,
+                valor_total: totalPrice,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Salvar agendamento (você pode conectar isso a um banco de dados)
+            let appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
+            appointments.push(appointment);
+            localStorage.setItem('appointments', JSON.stringify(appointments));
+            
+            // Reset do formulário após alguns segundos
+            setTimeout(() => {
+                location.reload();
+            }, 4000);
+        });
+
+        // Inicializar com a data de hoje
+        selectedDate = today;
+        generateTimeSlots();
+    </script>
+</body>
+</html>
